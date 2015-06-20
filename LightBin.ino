@@ -5,27 +5,31 @@
 * By: http://www.seeedstudio.com
 */
 #include <math.h>
-const int ledPin=12;                 //Connect the LED Grove module to Pin8, Digital 8
 const int thresholdvalue=10;         //The threshold for which the LED should turn on. 
-float Rsensor; //Resistance of sensor in K
+ //Resistance of sensor in K
+
+float lastRes = 0;
+ 
 void setup() {
   Serial.begin(9600);                //Start the Serial connection
-  pinMode(ledPin,OUTPUT);            //Set the LED on Digital 8 as an OUTPUT
 }
 void loop() {
-  int sensorValue = analogRead(0); 
-  Rsensor=(float)(1023-sensorValue)*10/sensorValue;
-  if(Rsensor>thresholdvalue)
-  {
-    digitalWrite(ledPin,HIGH);
-  }
-  else
-  {
-  digitalWrite(ledPin,LOW);
-  }
-  Serial.println("the analog read data is ");
+  int sensorValue = analogRead(5);
   Serial.println(sensorValue);
-  Serial.println("the sensor resistance is ");
-  Serial.println(Rsensor,DEC);//show the light intensity on the serial monitor;
-  delay(1000);
+  
+  float newRes = convertToRes(sensorValue);
+
+  float delta = newRes - lastRes;
+  float abs_delta = abs(delta);
+  // if ( abs_delta > 1.0f ) {
+    //Serial.println(delta);
+  // }
+  
+  lastRes = newRes;
+  delay(500);
 }
+
+float convertToRes(int sensorValue) {
+  return (float)(1023-sensorValue)*10/sensorValue;
+}
+
